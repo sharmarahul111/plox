@@ -46,7 +46,11 @@ class Scanner:
 				# // comment support
 				while self.peek() != '\n' and not self.is_at_end():
 					self.advance()
+		
 			else: self.add_token(TokenType.SLASH)
+		elif c==' ' or c=='\t' or c=='\r':
+			pass
+		elif c=='\n': self.line+=1
 		else: self.lox.error(self.line, "Unexpected Character")
 
 	def match(self, expected) -> bool:
