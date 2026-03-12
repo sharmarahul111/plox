@@ -20,8 +20,8 @@ class Lox:
 			self.had_error = false
 
 	def run(self, source):
-		scanner = Scanner()
-		tokens: list = scanner.scan_tokens(source)
+		scanner = Scanner(source)
+		tokens: list = scanner.scan_tokens()
 		for token in tokens:
 			print(token)
 		if self.had_error:
