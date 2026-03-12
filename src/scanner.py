@@ -36,6 +36,7 @@ class Scanner:
 		return self.tokens
 	
 	def scan_token(self):
+		# TODO: add /* comments */
 		c: str = self.advance()
 		if c == '(':self.add_token(TokenType.LEFT_PAREN)
 		elif c == ')': self.add_token(TokenType.RIGHT_PAREN)
@@ -132,11 +133,13 @@ class Scanner:
 		if self.peek() == '.' and self.is_digit(self.peek_next()):
 			# consume the .
 			self.advance()
-			while self.is_digit(self.peek()): self.advance()
+			while self.is_digit(self.peek()):
+				self.advance()
 		num = self.source[self.start:self.current]
 		self.add_token(TokenType.NUMBER, float(num))
 	def identifier(self):
-		while(self.is_alphanum(self.peek())): self.advance()
+		while(self.is_alphanum(self.peek())):
+			self.advance()
 		text = self.source[self.start:self.current]
 		token_type = Scanner.keywords.get(text, TokenType.IDENTIFIER)
 		self.add_token(token_type)
