@@ -1,6 +1,24 @@
 from token import Token
 from token_type import TokenType
 class Scanner:
+	keywords = {
+		"and": TokenType.AND,
+		"class": TokenType.CLASS,
+		"else": TokenType.ELSE,
+		"false": TokenType.FALSE,
+		"for": TokenType.FOR,
+		"fun": TokenType.FUN,
+		"if": TokenType.IF,
+		"nil": TokenType.NIL,
+		"or": TokenType.OR,
+		"print": TokenType.PRINT,
+		"return": TokenType.RETURN,
+		"super": TokenType.SUPER,
+		"this": TokenType.THIS,
+		"true": TokenType.TRUE,
+		"var": TokenType.VAR,
+		"while": TokenType.WHILE,
+	}
 	def __init__(self, lox, source: str):
 		self.lox = lox
 		self.source: str = source
@@ -53,8 +71,10 @@ class Scanner:
 		elif c=='\n': self.line+=1
 		elif c=='"': self.string()
 		else:
-			if(self.is_digit(c)):
+			if self.is_digit(c):
 				self.number()
+			elif self.is_alpha(c):
+				self.identifier()
 			else:
 				self.lox.error(self.line, "Unexpected character")
 
@@ -83,7 +103,11 @@ class Scanner:
 		else:
 			return self.source[self.current+1]
 	def is_digit(self, c: str):
-		return 48 <= ord(c) <= 57
+		return '0' <= c <= '9'
+	def is_alpha(self, c: str):
+		return 'a' <= c <= 'z' or 'A' <= c <= 'Z' or c== '_'
+	def is_alphanum(self, c):
+		return self.is_alpha(c) or self.is_digit(c)
 	def add_token(self, token_type: TokenType, literal=None):
 		text = self.source[self.start:self.current]
 		self.tokens.append(Token(token_type, text, literal, self.line))
@@ -106,7 +130,13 @@ class Scanner:
 	def number(self):
 		while self.is_digit(self.peek()): self.advance()
 		if self.peek() == '.' and self.is_digit(self.peek_next()):
+			# consume the .
 			self.advance()
 			while self.is_digit(self.peek()): self.advance()
 		num = self.source[self.start:self.current]
 		self.add_token(TokenType.NUMBER, float(num))
+	def identifier(self):
+		while(self.is_alphanum(self.peek())): self.advance()
+		text = self.source[self.start:self.current]
+		token_type = Scanner.keywords.get(text, TokenType.IDENTIFIER)
+		self.add_token(token_type)
