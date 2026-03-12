@@ -52,7 +52,11 @@ class Scanner:
 			pass
 		elif c=='\n': self.line+=1
 		elif c=='"': self.string()
-		else: self.lox.error(self.line, "Unexpected character")
+		else:
+			if(self.is_digit(c)):
+				self.number()
+			else:
+				self.lox.error(self.line, "Unexpected character")
 
 	def match(self, expected) -> bool:
 		if self.is_at_end():
@@ -73,7 +77,13 @@ class Scanner:
 			return '\0'
 		else:
 			return self.source[self.current]
-
+	def peek_next(self):
+		if self.current + 1 >= len(self.source):
+			return '\0'
+		else:
+			return self.source[self.current+1]
+	def is_digit(self, c: str):
+		return 48 <= ord(c) <= 57
 	def add_token(self, token_type: TokenType, literal=None):
 		text = self.source[self.start:self.current]
 		self.tokens.append(Token(token_type, text, literal, self.line))
@@ -92,3 +102,11 @@ class Scanner:
 		text = self.source[self.start+1:self.current-1]
 		# TODO: handle escape characters here
 		self.add_token(TokenType.STRING, text)
+
+	def number(self):
+		while self.is_digit(self.peek()): self.advance()
+		if self.peek() == '.' and self.is_digit(self.peek_next()):
+			self.advance()
+			while self.is_digit(self.peek()): self.advance()
+		num = self.source[self.start:self.current]
+		self.add_token(TokenType.NUMBER, float(num))
