@@ -41,6 +41,12 @@ class Scanner:
 		elif c == '<':
 			if self.match('='): self.add_token(TokenType.LESS_EQUAL)
 			else: self.add_token(TokenType.LESS)
+		elif c == '/':
+			if self.match("/"):
+				# // comment support
+				while self.peek() != '\n' and not self.is_at_end():
+					self.advance()
+			else: self.add_token(TokenType.SLASH)
 		else: self.lox.error(self.line, "Unexpected Character")
 
 	def match(self, expected) -> bool:
@@ -56,6 +62,12 @@ class Scanner:
 	def advance(self):
 		self.current += 1
 		return self.source[self.current-1]
+
+	def peek(self):
+		if self.is_at_end():
+			return '\0'
+		else:
+			return self.source[self.current]
 
 	def add_token(self, token_type: TokenType, literal=None):
 		text = self.source[self.start:self.current]
