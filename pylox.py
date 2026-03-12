@@ -1,3 +1,4 @@
+# refer to `man sysexits.h` for exit codes
 import sys
 from lox import Lox
 
