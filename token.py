@@ -7,4 +7,4 @@ class Token:
 		self.line = line
 	
 	def __repr__(self):
-		return self.token_type + " " + self.lexeme + " " + self.literal
+		return " ".join([self.token_type.name, self.lexeme, str(self.literal)])

@@ -1,5 +1,5 @@
 from scanner import Scanner
-# import sys
+import sys
 class Lox:
 	def __init__(self):
 		self.had_error = False
@@ -17,10 +17,10 @@ class Lox:
 			if line.strip() == "":
 				continue
 			self.run(line)
-			self.had_error = false
+			self.had_error = False
 
 	def run(self, source):
-		scanner = Scanner(source)
+		scanner = Scanner(self, source)
 		tokens: list = scanner.scan_tokens()
 		for token in tokens:
 			print(token)
@@ -28,7 +28,7 @@ class Lox:
 			sys.exit(65)
 
 	def error(self, line: int, message: str) -> None:
-		report(line, "", message)
+		self.report(line, "", message)
 
 	def report(self, line: int, where: str, message: str) -> None:
 		# TODO: implement error like gcc which shows the code with formatted arrows

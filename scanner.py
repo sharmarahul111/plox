@@ -1,7 +1,8 @@
 from token import Token
 from token_type import TokenType
 class Scanner:
-	def __init__(self, source: str):
+	def __init__(self, lox, source: str):
+		self.lox = lox
 		self.source: str = source
 		self.tokens: list[Token] = []
 		self.start: int = 0
@@ -17,7 +18,26 @@ class Scanner:
 		return self.tokens
 	
 	def scan_token(self):
-		pass
+		c: str = self.advance()
+		if c == '(':self.add_token(TokenType.LEFT_PAREN)
+		elif c == ')': self.add_token(TokenType.RIGHT_PAREN)
+		elif c == '{': self.add_token(TokenType.LEFT_BRACE)
+		elif c == '}': self.add_token(TokenType.RIGHT_BRACE)
+		elif c == ',': self.add_token(TokenType.COMMA)
+		elif c == '.': self.add_token(TokenType.DOT)
+		elif c == '-': self.add_token(TokenType.MINUS)
+		elif c == '+': self.add_token(TokenType.PLUS)
+		elif c == ';': self.add_token(TokenType.SEMICOLON)
+		elif c == '*': self.add_token(TokenType.STAR)
+		else: self.lox.error(self.line, "Unexpected Error")
 
 	def is_at_end(self) -> bool:
 		return self.current >= len(self.source)
+
+	def advance(self):
+		self.current += 1
+		return self.source[self.current-1]
+
+	def add_token(self, token_type: TokenType, literal=None):
+		text = self.source[self.start:self.current]
+		self.tokens.append(Token(token_type, text, literal, self.line))
