@@ -51,7 +51,8 @@ class Scanner:
 		elif c==' ' or c=='\t' or c=='\r':
 			pass
 		elif c=='\n': self.line+=1
-		else: self.lox.error(self.line, "Unexpected Character")
+		elif c=='"': self.string()
+		else: self.lox.error(self.line, "Unexpected character")
 
 	def match(self, expected) -> bool:
 		if self.is_at_end():
@@ -76,3 +77,18 @@ class Scanner:
 	def add_token(self, token_type: TokenType, literal=None):
 		text = self.source[self.start:self.current]
 		self.tokens.append(Token(token_type, text, literal, self.line))
+
+	def string(self):
+		while self.peek() != '"' and not self.is_at_end():
+			if self.peek() == '\n':
+				self.line+=1
+			self.advance()
+		if self.is_at_end():
+			self.lox.error(self.line, "Unterminated string")
+			return
+		# the closing "
+		self.advance()
+		# exclude surrounding quotes
+		text = self.source[self.start+1:self.current-1]
+		# TODO: handle escape characters here
+		self.add_token(TokenType.STRING, text)
