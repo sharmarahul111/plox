@@ -1,4 +1,8 @@
 from scanner import Scanner
+from parser import Parser
+from ast_printer import AstPrinter
+from expr import *
+from token_type import TokenType
 import sys
 class Lox:
 	def __init__(self):
@@ -22,10 +26,14 @@ class Lox:
 	def run(self, source):
 		scanner = Scanner(self, source)
 		tokens: list = scanner.scan_tokens()
-		for token in tokens:
-			print(token)
+		parser = Parser(self, tokens)
+		expr: Expr = parser.parse();
+		# for token in tokens:
+		# 	print(token)
 		if self.had_error:
 			sys.exit(65)
+		# print(expr)
+		print(AstPrinter().prints(expr))
 
 	def error(self, line: int, message: str) -> None:
 		self.report(line, "", message)
@@ -34,5 +42,11 @@ class Lox:
 		# TODO: implement error like gcc which shows the code with formatted arrows
 		print("[line", line, "] Error", where, ":", message, file=sys.stderr)
 		self.had_error = True
+
+	def token_error(self, token: Token, message: str):
+		if token.token_type == TokenType.EOF:
+			self.report(token.line, "at end", message)
+		else:
+			self.report(token.line, f"at '{token.lexeme}'", message)
 		
 	

@@ -1,18 +1,24 @@
 from token import Token
-from token_type import TokenType
+from token_type import *
 from expr import *
 
 class Parser:
-	def __init__(self, tokens: list[Token]):
-		self.tokens: list[Token] = token
+	def __init__(self, lox: Lox, tokens: list[Token]):
+		self.tokens: list[Token] = tokens
 		self.current = 0
+		self.lox = lox
 
+	def parse(self):
+		try:
+			return self.expression()
+		except ParseError:
+			return None
 	def expression(self) -> Expr:
 		return self.equality()
 
 	def equality(self) -> Expr:
 		expr: Expr = self.comparison()
-		while self.match(TokenType.BANG, TokenType.BANG_EQUAL):
+		while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
 			operator: Token = self.previous()
 			right: Expr = self.comparison()
 			expr = Binary(expr, operator, right)
@@ -62,34 +68,53 @@ class Parser:
 
 		if self.match(TokenType.LEFT_PAREN):
 			expr: Expr = self.expression()
-			self.consume(RIGHT_PAREN, "Expect ')' after expression.")
+			self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
 			return Grouping(expr)
-	
-	def match(self, *token_types: list[TokenType]) -> bool:
+		raise self.error(self.peek(), "Expect expression")
+
+
+	def match(self, *token_types: TokenType) -> bool:
 		for token_type in token_types:
 			if self.check(token_type):
-				advance()
+				self.advance()
 				return True
 		return False
 	
-	def consume(token_type: TokenType, message: str):
+	def consume(self, token_type: TokenType, message: str):
 		if self.check(token_type):
 			return self.advance()
-		self.error(self.peek(), message)
+		raise self.error(self.peek(), message)
+
+	def error(self, token: Token, message: str):
+		self.lox.token_error(token, message)
+		return ParseError()
+
+	def synchronise(self):
+		self.advance()
+		while not self.is_at_end():
+			if self.previous().token_type == TokenType.SEMICOLON: return
+			if self.peek().token_type in [TokenType.CLASS, TokenType.VAR, TokenType.IF, TokenType.FOR, TokenType.FUN,
+			TokenType.WHILE, TokenType.PRINT, TokenType.RETURN]:
+				return;
+			self.advance()
 
 	def check(self, token_type: TokenType) -> bool:
-		if self.is_at_end(): return False
+		if self.is_at_end():
+			return False
 		return self.peek().token_type == token_type
 
 	def advance(self)-> Token:
 		if not self.is_at_end(): self.current+=1
 		return self.previous()
 
-	def is_at_end() -> bool:
+	def is_at_end(self) -> bool:
 		return self.peek().token_type == TokenType.EOF
 
-	def peek() -> Token:
+	def peek(self) -> Token:
 		return self.tokens[self.current]
 
-	def previous() -> Token:
+	def previous(self) -> Token:
 		return self.tokens[self.current - 1]
+
+class ParseError(BaseException):
+	pass
