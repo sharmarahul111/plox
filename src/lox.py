@@ -7,7 +7,12 @@ import sys
 class Lox:
 	def __init__(self):
 		self.had_error = False
+		self.had_runtime_error = False
 	def run_file(self, path: str):
+		if self.had_error:
+			sys.exit(65)
+		if self.had_runtime_error:
+			sys.exit(70)
 		with open(path) as script:
 			self.run(script.read())
 
@@ -27,12 +32,8 @@ class Lox:
 		scanner = Scanner(self, source)
 		tokens: list = scanner.scan_tokens()
 		parser = Parser(self, tokens)
-		expr: Expr = parser.parse();
-		# for token in tokens:
-		# 	print(token)
-		if self.had_error:
-			sys.exit(65)
-		# print(expr)
+		expr: Expr = parser.parse()
+		if self.had_error: return
 		print(AstPrinter().prints(expr))
 
 	def error(self, line: int, message: str) -> None:
@@ -48,5 +49,10 @@ class Lox:
 			self.report(token.line, "at end", message)
 		else:
 			self.report(token.line, f"at '{token.lexeme}'", message)
+
+	def runtime_error(self, error):
+		print(error)
+		print(f"[line {error.token.line}]")
+		self.had_runtime_error = True
 		
 	
