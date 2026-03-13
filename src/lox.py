@@ -34,10 +34,12 @@ class Lox:
 		scanner = Scanner(self, source)
 		tokens: list = scanner.scan_tokens()
 		parser = Parser(self, tokens)
-		expr: Expr = parser.parse()
+		statements: list[Stmt] = parser.parse()
+
+		# stop if there was a syntax error
 		if self.had_error: return
 		# print(AstPrinter().prints(expr))
-		self.interpreter.interpret(expr)
+		self.interpreter.interpret(statements)
 
 	def error(self, line: int, message: str) -> None:
 		self.report(line, "", message)
@@ -47,7 +49,7 @@ class Lox:
 		print("[line", line, "] Error", where, ":", message, file=sys.stderr)
 		self.had_error = True
 
-	def token_error(self, token: Token, message: str):
+	def parse_error(self, token: Token, message: str):
 		if token.token_type == TokenType.EOF:
 			self.report(token.line, "at end", message)
 		else:

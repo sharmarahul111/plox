@@ -1,6 +1,8 @@
 from Token import Token
 from token_type import *
 from expr import *
+from stmt import *
+from error import ParseError
 
 class Parser:
 	def __init__(self, lox: Lox, tokens: list[Token]):
@@ -8,13 +10,33 @@ class Parser:
 		self.current = 0
 		self.lox = lox
 
-	def parse(self):
+	def parse(self) -> list[Stmt]:
 		try:
-			return self.expression()
-		except ParseError:
-			return None
+			statements = []
+			while not self.is_at_end():
+				statements.append(self.statement())
+			return statements
+		except ParseError as error:
+			self.lox.parse_error(error.token, error)
+
 	def expression(self) -> Expr:
 		return self.equality()
+
+	def statement(self) -> Stmt:
+		if self.match(TokenType.PRINT):
+			return self.print_statement()
+		return self.expression_statement()
+
+	def print_statement(self):
+		value: Expr = self.expression()
+		self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+		return Print(value)
+
+	def expression_statement(self):
+		expr: Expr = self.expression()
+		self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+		return Expression(expr)
+
 
 	def equality(self) -> Expr:
 		expr: Expr = self.comparison()
@@ -83,11 +105,10 @@ class Parser:
 	def consume(self, token_type: TokenType, message: str):
 		if self.check(token_type):
 			return self.advance()
-		raise self.error(self.peek(), message)
+		self.error(self.peek(), message)
 
 	def error(self, token: Token, message: str):
-		self.lox.token_error(token, message)
-		return ParseError()
+		raise ParseError(token, message)
 
 	def synchronise(self):
 		self.advance()
@@ -115,6 +136,3 @@ class Parser:
 
 	def previous(self) -> Token:
 		return self.tokens[self.current - 1]
-
-class ParseError(BaseException):
-	pass

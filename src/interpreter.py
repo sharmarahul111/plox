@@ -1,19 +1,31 @@
 from expr import *
+from stmt import *
 from token_type import TokenType
 from error import LoxRuntimeError
 
 class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
 		self.lox = lox
-	def interpret(self, expr: Expr):
+	def interpret(self, statements: list[Stmt]):
 		try:
-			value = self.evaluate(expr)
-			print(self.stringify(value))
+			for statement in statements:
+				self.execute(statement)
 		except LoxRuntimeError as error:
 			self.lox.runtime_error(error)
 
 	def evaluate(self, expr: Expr):
 		return expr.accept(self)
+
+	def execute(self, statement: Stmt):
+		return statement.accept(self)
+
+	def visit_expression_stmt(self, stmt: Stmt):
+		self.execute(stmt.expression) # no returning
+
+	def visit_print_stmt(self, stmt: Stmt):
+		value = self.execute(stmt.expression)
+		print(self.stringify(value), end='\n')
+
 
 	def visit_binary_expr(self, expr: Binary):
 		left = self.evaluate(expr.left)
