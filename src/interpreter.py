@@ -49,6 +49,8 @@ class Interpreter(Visitor):
 				raise LoxRuntimeError(expr.operator, "Operands must be two numbers or two strings")
 		elif expr.operator.token_type == TokenType.SLASH:
 			self.check_number_operands(expr.operator, left, right)
+			if right==0:
+				raise LoxRuntimeError(expr.operator, "Divide by 0 not allowed")
 			return left / right
 		elif expr.operator.token_type == TokenType.STAR:
 			self.check_number_operands(expr.operator, left, right)
