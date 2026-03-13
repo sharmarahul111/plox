@@ -3,11 +3,13 @@ from parser import Parser
 from ast_printer import AstPrinter
 from expr import *
 from token_type import TokenType
+from interpreter import Interpreter
 import sys
 class Lox:
 	def __init__(self):
 		self.had_error = False
 		self.had_runtime_error = False
+		self.interpreter = Interpreter(self)
 	def run_file(self, path: str):
 		if self.had_error:
 			sys.exit(65)
@@ -34,7 +36,8 @@ class Lox:
 		parser = Parser(self, tokens)
 		expr: Expr = parser.parse()
 		if self.had_error: return
-		print(AstPrinter().prints(expr))
+		# print(AstPrinter().prints(expr))
+		self.interpreter.interpret(expr)
 
 	def error(self, line: int, message: str) -> None:
 		self.report(line, "", message)
