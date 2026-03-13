@@ -1,0 +1,3 @@
+print "Hello wrold";
+print "How are you";
+print -15*(-2+3)>=-12;

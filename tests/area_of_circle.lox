@@ -1,0 +1,5 @@
+var PI = 3.14;
+var radius = 20;
+var area = 2*PI*radius;
+print "The area of the circle is:";
+print area;
