@@ -2,10 +2,13 @@ from expr import *
 from stmt import *
 from token_type import TokenType
 from error import LoxRuntimeError
+from environment import Environment
 
 class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
 		self.lox = lox
+		self.environment = Environment()
+
 	def interpret(self, statements: list[Stmt]):
 		try:
 			for statement in statements:
@@ -26,6 +29,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 		value = self.execute(stmt.expression)
 		print(self.stringify(value), end='\n')
 
+	def visit_var_stmt(self, stmt: Var):
+		value = None
+		if stmt.initializer is not None:
+			value = self.evaluate(stmt.initializer)
+		self.environment.define(stmt.name.lexeme, value)
 
 	def visit_binary_expr(self, expr: Binary):
 		left = self.evaluate(expr.left)
@@ -84,6 +92,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 		# Unreachable
 		return None
 	
+	def visit_variable_expr(self, expr: Variable):
+		return self.environment.get(expr.name)
+		
 	def check_number_operand(self, operator: Token, operand):
 		# int would require not bool, since bool derives from int
 		if isinstance(operand, float): return
