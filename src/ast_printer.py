@@ -22,7 +22,7 @@ class AstPrinter(Visitor):
 		return f"({' '.join(parts)})"
 
 if __name__ == "__main__":
-	from token import Token
+	from Token import Token
 	from token_type import TokenType
 	expr = Binary(
 		Unary(

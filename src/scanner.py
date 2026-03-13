@@ -1,4 +1,4 @@
-from token import Token
+from Token import Token
 from token_type import TokenType
 class Scanner:
 	keywords = {

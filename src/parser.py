@@ -1,4 +1,4 @@
-from token import Token
+from Token import Token
 from token_type import *
 from expr import *
 
@@ -95,7 +95,7 @@ class Parser:
 			if self.previous().token_type == TokenType.SEMICOLON: return
 			if self.peek().token_type in [TokenType.CLASS, TokenType.VAR, TokenType.IF, TokenType.FOR, TokenType.FUN,
 			TokenType.WHILE, TokenType.PRINT, TokenType.RETURN]:
-				return;
+				return
 			self.advance()
 
 	def check(self, token_type: TokenType) -> bool:
