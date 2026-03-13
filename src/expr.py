@@ -1,9 +1,4 @@
-"""
-    Binary : Expr left, Token operator, Expr right,
-    Grouping : Expr expr,
-    Literal : Object value,
-    Unary : Token operator, Expr right
-"""
+from Token import Token
 class ExprVisitor:
 	def visit_binary_expr(self, expr):
 		...
@@ -14,6 +9,8 @@ class ExprVisitor:
 	def visit_unary_expr(self, expr):
 		...
 	def visit_variable_expr(self, expr):
+		...
+	def visit_assign_expr(self, expr):
 		...
 
 
@@ -57,3 +54,11 @@ class Variable(Expr):
 	
 	def accept(self, visitor):
 		return visitor.visit_variable_expr(self)
+
+class Assign(Expr):
+	def __init__(self, name: Token, value: Expr):
+		self.name = name
+		self.value = value
+
+	def accept(self, visitor):
+		return visitor.visit_assign_expr(self)

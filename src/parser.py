@@ -20,7 +20,7 @@ class Parser:
 			self.lox.parse_error(error.token, error)
 
 	def expression(self) -> Expr:
-		return self.equality()
+		return self.assignment()
 
 	def declaration(self) -> Stmt:
 		try:
@@ -55,6 +55,16 @@ class Parser:
 		self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
 		return Expression(expr)
 
+	def assignment(self):
+		expr: Expr = self.equality()
+		if self.match(TokenType.EQUAL):
+			equals: Token = self.previous()
+			value: Expr = self.assignment()
+			if isinstance(expr, Variable):
+				name: Token = expr.name
+				return Assign(name, value)
+			self.error(equals, "Invalig assignment target.")
+		return expr
 
 	def equality(self) -> Expr:
 		expr: Expr = self.comparison()

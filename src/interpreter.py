@@ -35,6 +35,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 			value = self.evaluate(stmt.initializer)
 		self.environment.define(stmt.name.lexeme, value)
 
+	def visit_assign_expr(self, expr: Assign):
+		value = self.evaluate(expr.value)
+		self.environment.assign(expr.name, value)
+		return value
+
 	def visit_binary_expr(self, expr: Binary):
 		left = self.evaluate(expr.left)
 		right = self.evaluate(expr.right)
@@ -94,7 +99,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 	
 	def visit_variable_expr(self, expr: Variable):
 		return self.environment.get(expr.name)
-		
+
 	def check_number_operand(self, operator: Token, operand):
 		# int would require not bool, since bool derives from int
 		if isinstance(operand, float): return
