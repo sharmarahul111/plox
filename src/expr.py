@@ -4,7 +4,7 @@
     Literal : Object value,
     Unary : Token operator, Expr right
 """
-class Visitor:
+class ExprVisitor:
 	def visit_binary_expr(self, expr):
 		...
 	def visit_grouping_expr(self, expr):

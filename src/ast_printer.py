@@ -1,6 +1,6 @@
 from expr import *
 
-class AstPrinter(Visitor):
+class AstPrinter(ExprVisitor):
 	def prints(self, expr):
 		return expr.accept(self)
 	

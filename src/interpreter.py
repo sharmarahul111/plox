@@ -2,7 +2,7 @@ from expr import *
 from token_type import TokenType
 from error import LoxRuntimeError
 
-class Interpreter(Visitor):
+class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
 		self.lox = lox
 	def interpret(self, expr: Expr):
