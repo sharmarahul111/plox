@@ -1,0 +1,110 @@
+from expr import *
+from token_type import TokenType
+from error import LoxRuntimeError
+
+class Interpreter(Visitor):
+	def __init__(self, lox):
+		self.lox = lox
+	def interpret(self, expr: Expr):
+		try:
+			value = self.evaluate(expr)
+			print(self.stringify(value))
+		except LoxRuntimeError as error:
+			self.lox.runtime_error(error)
+
+	def evaluate(self, expr: Expr):
+		return expr.accept(self)
+
+	def visit_binary_expr(self, expr: Binary):
+		left = self.evaluate(expr.left)
+		right = self.evaluate(expr.right)
+
+		# maybe just remove those float() since already its checked
+		if expr.operator.token_type == TokenType.GREATER:
+			self.check_number_operands(expr.operator, left, right)
+			return left > right
+		elif expr.operator.token_type == TokenType.GREATER_EQUAL:
+			self.check_number_operands(expr.operator, left, right)
+			return left >= right
+		elif expr.operator.token_type == TokenType.LESS:
+			self.check_number_operands(expr.operator, left, right)
+			return left < right
+		elif expr.operator.token_type == TokenType.LESS_EQUAL:
+			self.check_number_operands(expr.operator, left, right)
+			return left <= right
+		elif expr.operator.token_type == TokenType.BANG_EQUAL:
+			return not self.is_equal(left, right)
+		elif expr.operator.token_type == TokenType.EQUAL_EQUAL:
+			return self.is_equal(left, right)
+		elif expr.operator.token_type == TokenType.MINUS:
+			self.check_number_operands(expr.operator, left, right)
+			return left - right
+		elif expr.operator.token_type == TokenType.PLUS:
+			if isinstance(left, str) and isinstance(right, str):
+				return left + right
+			elif isinstance(left, float) and isinstance(right, float):
+				return left + right
+			else:
+				# throw some error here for type mismatch
+				raise LoxRuntimeError(expr.operator, "Operands must be two numbers or two strings")
+		elif expr.operator.token_type == TokenType.SLASH:
+			self.check_number_operands(expr.operator, left, right)
+			return left / right
+		elif expr.operator.token_type == TokenType.STAR:
+			self.check_number_operands(expr.operator, left, right)
+			return left * right
+
+		# Unreachable
+		return None
+
+	def visit_literal_expr(self, expr: Literal):
+		return expr.value
+
+	def visit_unary_expr(self, expr: Unary):
+		right = self.evaluate(expr.right)
+		if expr.operator.token_type == TokenType.MINUS:
+			self.check_number_operand(expr.operator, right)
+			return -right
+		elif expr.operator.token_type == TokenType.BANG:
+			return not self.is_truthy(right)
+		# Unreachable
+		return None
+	
+	def check_number_operand(self, operator: Token, operand):
+		# int would require not bool, since bool derives from int
+		if isinstance(operand, float): return
+		raise LoxRuntimeError(operator, "Operand must be a number")
+
+	def check_number_operands(self, operator: Token, left, right):
+		# int would require not bool, since bool derives from int
+		if isinstance(left, float) and isinstance(right, float): return
+		raise LoxRuntimeError(operator, "Operands must be numbers")
+	
+
+	def visit_grouping_expr(self, expr: Grouping):
+		return self.evaluate(expr.expr)
+
+	def is_truthy(self, obj) -> bool:
+		if obj is None: return False
+		if isinstance(obj, bool): return obj
+		return True
+
+	def is_equal(self, a, b):
+		# if a is None and b is None:
+		# 	return True
+		# # in static languages u can't call equals() on null
+		# # doesn't matter here in python i guess
+		# if a is None:
+		# 	return False
+		return a==b
+
+	def stringify(self, value):
+		if value is None: return "nil"
+		if isinstance(value, float):
+			text = str(value)
+			if text.endswith('.0'):
+				return text[:-2]
+			return text
+		if isinstance(value, bool):
+			return str(value).lower()
+		return str(value)
