@@ -5,6 +5,8 @@ class StmtVisitor:
 		...
 	def visit_expression_stmt(self, expr):
 		...
+	def visit_block_stmt(self, expr):
+		...
 
 
 class Stmt():
@@ -32,3 +34,10 @@ class Var(Stmt):
 
 	def accept(self, visitor: StmtVisitor):
 		return visitor.visit_var_stmt(self)
+
+class Block(Stmt):
+	def __init__(self, statements: list[Stmt]):
+		self.statements = statements
+
+	def accept(self, visitor: StmtVisitor):
+		return visitor.visit_block_stmt(self)
