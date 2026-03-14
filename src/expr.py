@@ -14,6 +14,8 @@ class ExprVisitor:
 		...
 	def visit_assign_expr(self, expr):
 		...
+	def visit_call_expr(self, expr):
+		...
 
 
 class Expr:
@@ -28,6 +30,15 @@ class Binary(Expr):
 
 	def accept(self, visitor):
 		return visitor.visit_binary_expr(self)
+
+class Call(Expr):
+	def __init__(self, callee: Expr, paren: Token, arguments: list[Expr]):
+		self.callee: Expr = callee
+		self.paren: Token = paren
+		self.arguments: list[Expr] = arguments
+	
+	def accept(self, visitor):
+		return visitor.visit_call_expr(self)
 
 class Grouping(Expr):
 	def __init__(self, expr):

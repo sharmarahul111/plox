@@ -3,11 +3,14 @@ from stmt import *
 from token_type import TokenType
 from error import LoxRuntimeError
 from environment import Environment
+from loxcallable import LoxCallable, LoxBuiltins
 
 class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
 		self.lox = lox
-		self.environment = Environment()
+		self.globals = Environment()
+		self.environment = self.globals
+		self.globals.define("clock", LoxBuiltins.Clock())
 
 	def interpret(self, statements: list[Stmt]):
 		try:
@@ -42,7 +45,6 @@ class Interpreter(ExprVisitor, StmtVisitor):
 			self.execute(stmt.then_branch)
 		elif stmt.else_branch is not None:
 			self.execute(stmt.else_branch)
-
 
 	def visit_print_stmt(self, stmt: Print):
 		value = self.execute(stmt.expression)
@@ -107,6 +109,17 @@ class Interpreter(ExprVisitor, StmtVisitor):
 		# Unreachable
 		return None
 
+	def visit_call_expr(self, expr: Call):
+		callee = self.evaluate(expr.callee)
+		arguments = [self.evaluate(argument) for argument in expr.arguments]
+		if not isinstance(callee, LoxCallable):
+			raise LoxRuntimeError(expr.paren, "Can only call functions and classes.")
+		function: LoxCallable = callee
+		if len(arguments) != function.arity():
+			raise LoxRuntimeError(expr.paren,
+			"Expected " + str(function.arity()) + " arguments but got " + len(arguments) + ".")
+		return function.call(self, arguments)
+
 	def visit_literal_expr(self, expr: Literal):
 		return expr.value
 	
@@ -141,7 +154,6 @@ class Interpreter(ExprVisitor, StmtVisitor):
 		if isinstance(left, float) and isinstance(right, float): return
 		raise LoxRuntimeError(operator, "Operands must be numbers")
 	
-
 	def visit_grouping_expr(self, expr: Grouping):
 		return self.evaluate(expr.expr)
 

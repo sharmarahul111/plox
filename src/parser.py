@@ -39,6 +39,7 @@ class Parser:
 			return self.if_statement()
 		elif self.match(TokenType.PRINT):
 			return self.print_statement()
+			# add support for break and continue
 		elif self.match(TokenType.WHILE):
 			return self.while_statement()
 		elif self.match(TokenType.LEFT_BRACE):
@@ -180,7 +181,27 @@ class Parser:
 			operator: Token = self.previous()
 			right: Expr = self.unary()
 			return Unary(operator, right)
-		return self.primary()
+		return self.call()
+	
+	def finish_call(self, callee: Expr):
+		arguments = []
+		if not self.check(TokenType.RIGHT_PAREN):
+			arguments.append(self.expression())
+			while self.match(TokenType.COMMA):
+				if len(arguments) >= 255:
+					self.error(self.peek(), "Can't have more than 255 arguments.")
+				arguments.append(self.expression)
+		paren: Token = self.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+		return Call(callee, paren, arguments)
+
+	def call(self) -> Expr:
+		expr: Expr = self.primary()
+		while True:
+			if self.match(TokenType.LEFT_PAREN):
+				expr = self.finish_call(expr)
+			else:
+				break
+		return expr
 
 	def primary(self):
 		if self.match(TokenType.FALSE):
