@@ -7,6 +7,8 @@ class StmtVisitor:
 		...
 	def visit_block_stmt(self, expr):
 		...
+	def visit_if_stmt(self, expr):
+		...
 
 
 class Stmt():
@@ -41,3 +43,12 @@ class Block(Stmt):
 
 	def accept(self, visitor: StmtVisitor):
 		return visitor.visit_block_stmt(self)
+
+class If(Stmt):
+	def __init__(self, condition: Expr, then_branch: Stmt, else_branch: Stmt):
+		self.condition = condition
+		self.then_branch = then_branch
+		self.else_branch = else_branch
+	
+	def accept(self, visitor: StmtVisitor):
+		return visitor.visit_if_stmt(self)

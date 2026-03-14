@@ -1,0 +1,20 @@
+var age = 11;
+if(age >= 18){
+	print "You can vote";
+	print "You are";
+	print age-18;
+	print "years older";
+	print "";
+} else {
+	print "You can't vote";
+	print "You are";
+	print 18-age;
+	print "years younger";
+	print "";
+
+	if(!(age<13)){
+		print "Atleast you are 13+";
+	} else {
+		print "YOu a bbbaaaaby";
+	}
+}

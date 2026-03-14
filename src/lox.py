@@ -19,6 +19,7 @@ class Lox:
 			self.run(script.read())
 
 	def run_prompt(self):
+		# add a way to print expressions in REPL without ;s
 		while True:
 			try:
 				line = input("> ")
