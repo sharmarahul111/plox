@@ -6,7 +6,7 @@ class Environment():
 		self.enclosing: Environment = enclosing
 
 	def get(self, name: Token):
-		if self.values.get(name.lexeme):
+		if self.values.get(name.lexeme) is not None:
 			return self.values.get(name.lexeme)
 		if self.enclosing is not None:
 			return self.enclosing.get(name)
