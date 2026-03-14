@@ -9,6 +9,8 @@ class StmtVisitor:
 		...
 	def visit_if_stmt(self, expr):
 		...
+	def visit_while_stmt(self, expr):
+		...
 
 
 class Stmt():
@@ -36,6 +38,14 @@ class Var(Stmt):
 
 	def accept(self, visitor: StmtVisitor):
 		return visitor.visit_var_stmt(self)
+
+class While(Stmt):
+	def __init__(self, condition: Expr, body: Stmt):
+		self.condition = condition
+		self.body = body
+
+	def accept(self, visitor: StmtVisitor):
+		return visitor.visit_while_stmt(self)
 
 class Block(Stmt):
 	def __init__(self, statements: list[Stmt]):
