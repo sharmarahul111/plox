@@ -2,15 +2,21 @@ from expr import Expr
 from Token import Token
 
 class StmtVisitor:
+	def visit_expression_stmt(self, expr):
+		...
+	def visit_function_stmt(self, expr):
+		...
 	def visit_print_stmt(self, expr):
 		...
-	def visit_expression_stmt(self, expr):
+	def visit_return_stmt(self, expr):
+		...
+	def visit_var_stmt(self, expr):
+		...
+	def visit_while_stmt(self, expr):
 		...
 	def visit_block_stmt(self, expr):
 		...
 	def visit_if_stmt(self, expr):
-		...
-	def visit_while_stmt(self, expr):
 		...
 
 
@@ -40,6 +46,15 @@ class Print(Stmt):
 
 	def accept(self, visitor: StmtVisitor):
 		return visitor.visit_print_stmt(self)
+
+class Return(Stmt):
+	def __init__(self,keyword: Token, value: Expr):
+		self.keyword = keyword
+		self.value = value
+
+	def accept(self, visitor: StmtVisitor):
+		return visitor.visit_return_stmt(self)
+
 
 class Var(Stmt):
 	def __init__(self, name: Token, initializer: Expr):

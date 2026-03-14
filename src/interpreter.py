@@ -1,7 +1,7 @@
 from expr import *
 from stmt import *
 from token_type import TokenType
-from error import LoxRuntimeError
+from error import LoxRuntimeError, ReturnException
 from environment import Environment
 from loxcallable import LoxCallable, LoxBuiltins
 from loxfunction import LoxFunction
@@ -54,6 +54,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 	def visit_print_stmt(self, stmt: Print):
 		value = self.execute(stmt.expression)
 		print(self.stringify(value), end='\n')
+
+	def visit_return_stmt(self, stmt: Return):
+		value = None
+		if stmt.value is not None:
+			value = self.evaluate(stmt.value)
+		raise ReturnException(value)
 
 	def visit_var_stmt(self, stmt: Var):
 		value = None

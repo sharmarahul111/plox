@@ -1,5 +1,6 @@
 from loxcallable import LoxCallable
 from environment import Environment
+from error import ReturnException
 from expr import *
 from stmt import *
 
@@ -11,9 +12,12 @@ class LoxFunction(LoxCallable):
 		environment = Environment(interpreter.globals)
 		for i, param in enumerate(self.declaration.params):
 			environment.define(param.lexeme, arguments[i])
-		interpreter.execute_block(self.declaration.body, environment)
-		# return statements later
+		try:
+			interpreter.execute_block(self.declaration.body, environment)
+		except ReturnException as return_value:
+			return return_value.value
 		return None
+		
 
 	def arity(self):
 		return len(self.declaration.params)
