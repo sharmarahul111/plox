@@ -1,0 +1,13 @@
+fun f(a){
+	print "hello";
+	print a;
+}
+var a = 10;
+f(a);
+
+// recursive count
+fun count(c){
+	if(c>1) count(c-1);
+	print(c);
+}
+count(4);

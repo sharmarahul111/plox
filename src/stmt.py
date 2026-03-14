@@ -1,4 +1,5 @@
 from expr import Expr
+from Token import Token
 
 class StmtVisitor:
 	def visit_print_stmt(self, expr):

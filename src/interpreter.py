@@ -4,6 +4,7 @@ from token_type import TokenType
 from error import LoxRuntimeError
 from environment import Environment
 from loxcallable import LoxCallable, LoxBuiltins
+from loxfunction import LoxFunction
 
 class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
@@ -39,6 +40,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
 	def visit_expression_stmt(self, stmt: Expression):
 		self.execute(stmt.expression) # no returning
+
+	def visit_function_stmt(self, stmt: Function):
+		function = LoxFunction(stmt)
+		self.environment.define(stmt.name.lexeme, function)
 
 	def visit_if_stmt(self, stmt: If):
 		if self.is_truthy(self.evaluate(stmt.condition)):
