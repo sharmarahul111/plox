@@ -16,7 +16,7 @@ class Environment():
 		self.values[name] = value
 	
 	def assign(self, name: Token, value):
-		if self.values.get(name.lexeme):
+		if self.values.get(name.lexeme) is not None:
 			self.values[name.lexeme] = value
 		elif self.enclosing is not None:
 			self.enclosing.assign(name, value)
