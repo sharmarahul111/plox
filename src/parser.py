@@ -24,7 +24,9 @@ class Parser:
 
 	def declaration(self) -> Stmt:
 		try:
-			if self.match(TokenType.VAR):
+			if self.match(TokenType.FUN):
+				return self.function("function")
+			elif self.match(TokenType.VAR):
 				return self.var_declaration()
 			return self.statement()
 		except ParseError as error:
@@ -110,7 +112,24 @@ class Parser:
 		self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
 		return Expression(expr)
 
+	def function(self, kind: str) -> Function:
+		name: Token = self.consume(TokenType.IDENTIFIER, f"Expect '{kind}' name.")
+		self.consume(TokenType.LEFT_PAREN, f"Expect '(' after '{kind}' name.")
+		parameters: list[Token] = []
+		if not self.check(TokenType.RIGHT_PAREN):
+			while self.match(TokenType.COMMA):
+				parameters.append(self.consume(TokenType.IDENTIFIER, "Expect parameter name"))
+				if len(parameters) >= 255:
+					self.error(self.peek(), "Can't have more than 255 parameters")
+					parameters.append(self.consume(TokenType.IDENTIFIER, "Expect parameter name"))
+		self.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+		self.consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.")
+		body: list[Stmt] = self.block();
+		return Function(name, parameters, body)
+
+
 	def block(self):
+		# assumes the '{' token has already been matched
 		statements = []
 		while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
 			statements.append(self.declaration())
