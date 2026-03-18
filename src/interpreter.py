@@ -163,6 +163,14 @@ class Interpreter(ExprVisitor, StmtVisitor):
 			if not self.is_truthy(left): return left
 		return self.evaluate(expr.right)
 
+	def visit_set_expr(self, expr: Set):
+		obj = self.evaluate(expr.obj)
+		if not isinstance(obj, LoxInstance):
+			raise LoxRuntimeError(expr.name, "Only instances have fields.")
+		value = self.evaluate(expr.value)
+		obj.sets(expr.name, value)
+		return value
+
 	def visit_unary_expr(self, expr: Unary):
 		right = self.evaluate(expr.right)
 		if expr.operator.token_type == TokenType.MINUS:

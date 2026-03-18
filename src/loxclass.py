@@ -12,7 +12,7 @@ class LoxInstance:
 		return f"{self.klass.name} instance"
 	
 	def get(self, name: Token):
-		if isinstance(self.fields.get(name.lexeme, Nil()), Nil):
+		if not isinstance(self.fields.get(name.lexeme, Nil()), Nil):
 			return self.fields[name.lexeme]
 		raise LoxRuntimeError(name, "Undefined property '" + name.lexeme + "'.")
 	
