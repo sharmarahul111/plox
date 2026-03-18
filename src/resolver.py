@@ -1,5 +1,6 @@
 from stmt import *
 from expr import *
+from environment import Nil
 
 class Resolver(StmtVisitor, ExprVisitor):
 	def __init__(self, lox: Lox, interpreter: Interpreter):
@@ -99,7 +100,10 @@ class Resolver(StmtVisitor, ExprVisitor):
 		if len(self.scopes) == 0:
 			return
 		# is only declared but not yet ready/initialized
-		self.scopes[-1][name.lexeme] = False
+		scope = self.scopes[-1]
+		if not isinstance(scope.get(name.lexeme, Nil()), Nil):
+			lox.error(name, "Already a variable with this name in this scope.")
+		scope[name.lexeme] = False
 	
 	def define(self, name: Token):
 		if len(self.scopes) == 0:
