@@ -4,5 +4,10 @@ class DevonshireCream {
   }
 }
 print DevonshireCream;
-var cls = DevonshireCream();
-print cls;
+var obj = DevonshireCream();
+print obj;
+
+obj.name = "Jake";
+obj.age = 20;
+print obj.name;
+print obj.age;
