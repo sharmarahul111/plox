@@ -49,6 +49,9 @@ class Resolver(StmtVisitor, ExprVisitor):
 		for argument in expr.arguments:
 			self.resolves(argument)
 
+	def visit_get_expr(self, expr: Get):
+		self.resolve(expr.obj)
+
 	def visit_grouping_expr(self, expr: Grouping):
 		self.resolve(expr.expr)
 

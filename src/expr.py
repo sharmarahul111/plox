@@ -2,6 +2,10 @@ from Token import Token
 class ExprVisitor:
 	def visit_binary_expr(self, expr):
 		...
+	def visit_call_expr(self, expr):
+		...
+	def visit_get_expr(self, expr):
+		...
 	def visit_grouping_expr(self, expr):
 		...
 	def visit_literal_expr(self, expr):
@@ -13,8 +17,6 @@ class ExprVisitor:
 	def visit_variable_expr(self, expr):
 		...
 	def visit_assign_expr(self, expr):
-		...
-	def visit_call_expr(self, expr):
 		...
 
 
@@ -39,6 +41,11 @@ class Call(Expr):
 	
 	def accept(self, visitor):
 		return visitor.visit_call_expr(self)
+
+class Get(Expr):
+	def __init__(self, obj: Expr, name: Token):
+		self.obj = expr
+		self.name = name
 
 class Grouping(Expr):
 	def __init__(self, expr):

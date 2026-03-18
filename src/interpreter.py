@@ -5,7 +5,7 @@ from error import LoxRuntimeError, ReturnException
 from environment import Environment
 from loxcallable import LoxCallable, LoxBuiltins
 from loxfunction import LoxFunction
-from loxclass import LoxClass
+from loxclass import LoxClass, LoxInstance
 
 class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
@@ -145,6 +145,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 			raise LoxRuntimeError(expr.paren,
 			"Expected " + str(function.arity()) + " arguments but got " + len(arguments) + ".")
 		return function.call(self, arguments)
+
+	def visit_get_expr(self, expr: Get):
+		obj: LoxInstance = self.evaluate(expr.obj)
+		if isinstance(obj, LoxInstance):
+			return obj.get(expr.name)
+		raise LoxRuntimeError(expr.name, "Only instances have properties.")
 
 	def visit_literal_expr(self, expr: Literal):
 		return expr.value
