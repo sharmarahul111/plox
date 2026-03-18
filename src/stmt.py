@@ -18,6 +18,8 @@ class StmtVisitor:
 		...
 	def visit_if_stmt(self, expr):
 		...
+	def visit_class_stmt(self, expr):
+		...
 
 
 class Stmt():
@@ -87,3 +89,11 @@ class If(Stmt):
 	
 	def accept(self, visitor: StmtVisitor):
 		return visitor.visit_if_stmt(self)
+
+class Class(Stmt):
+	def __init__(self, name: Token, methods: list[Function]):
+		self.name = name
+		self.methods = methods
+	
+	def accept(self, visitor: StmtVisitor):
+		return visitor.visit_class_stmt(self)
