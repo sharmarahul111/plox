@@ -11,6 +11,9 @@ class Resolver(StmtVisitor, ExprVisitor):
 		self.resolve(stmt.statements)
 		self.end_scope()
 
+	def visit_expression_stmt(self, stmt: Expression):
+		self.resolves(stmt.expression)
+
 	def visit_var_stmt(self, stmt: Var):
 		self.declare(stmt.name)
 		if stmt.initializer is not None:
@@ -26,6 +29,50 @@ class Resolver(StmtVisitor, ExprVisitor):
 		self.resolves(expr.value)
 		self.resolve_local(expr, expr.name)
 
+	def visit_binary_expr(self, expr: Binary):
+		self.resolves(expr.left)
+		self.resolves(expr.right)
+
+	def visit_call_expr(expr: Call):
+		self.resolve(expr.callee)
+		for argument in expr.arguments:
+			self.resolves(argument)
+
+	def visit_grouping_expr(self, expr: Grouping):
+		self.resolve(expr.expr)
+
+	def visit_literal_expr(self, expr: Literal):
+		return None
+	
+	def visit_logical_expr(self, expr: Logical):
+		self.resolves(expr.left)
+		self.resolves(expr.right)
+
+	def visit_unary_expr(self, expr: Unary):
+		self.resolves(expr.right)
+
+	def visit_function_stmt(self, stmt: Function):
+		self.declare(stmt.name)
+		self.define(stmt.name)
+		self.resolve_function(stmt)
+
+	def visit_if_stmt(self, stmt: If):
+		self.resolves(stmt.condition)
+		self.resolves(stmt.then_branch)
+		if stmt.else_branch is not None:
+			self.resolve(stmt.else_branch)
+
+	def visit_while_stmt(self, stmt: While):
+		self.resolves(stmt.condition)
+		self.resolve(stmt.body)
+
+	def visit_print_stmt(self, stmt: Print):
+		self.resolves(stmt.expression)
+
+	def visit_return_stmt(self, stmt: Return):
+		if stmt.value is not None:
+			self.resolves(stmt.value)
+
 	def resolve(self, statements: list):
 		for statement in statements:
 			# could be either expressions or statements
@@ -33,6 +80,14 @@ class Resolver(StmtVisitor, ExprVisitor):
 
 	def resolves(self, statement):
 		statement.accept(self)
+
+	def resolve_function(self, function: Function):
+		self.begin_scope()
+		for param in function.params:
+			self.declare(param)
+			self.define(param)
+		self.resolve(function.body)
+		self.end_scope()
 
 	def begin_scope(self):
 		self.scopes.append({})
