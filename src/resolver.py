@@ -17,7 +17,7 @@ class Resolver(StmtVisitor, ExprVisitor):
 	def visit_var_stmt(self, stmt: Var):
 		self.declare(stmt.name)
 		if stmt.initializer is not None:
-			self.resolve(stmt.initializer)
+			self.resolves(stmt.initializer)
 		self.define(stmt.name)
 
 	def visit_variable_expr(self, expr: Variable):
@@ -96,7 +96,7 @@ class Resolver(StmtVisitor, ExprVisitor):
 		self.scopes.pop()
 	
 	def declare(self, name: Token):
-		if len(self.scope) == 0:
+		if len(self.scopes) == 0:
 			return
 		# is only declared but not yet ready/initialized
 		self.scopes[-1][name.lexeme] = False
@@ -108,6 +108,6 @@ class Resolver(StmtVisitor, ExprVisitor):
 		self.scopes[-1][name.lexeme] = True
 
 	def resolve_local(self, expr: Expr, name: Token):
-		for i in range(len(self.scopes), 0, -1):
+		for i in range(len(self.scopes)-1, -1, -1):
 			if self.scopes[i].get(name.lexeme) is not None:
 				self.interpreter.resolve(expr, len(self.scopes)-1-i)

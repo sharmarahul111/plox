@@ -4,6 +4,7 @@ from ast_printer import AstPrinter
 from expr import *
 from token_type import TokenType
 from interpreter import Interpreter
+from resolver import Resolver
 import sys
 class Lox:
 	def __init__(self):
@@ -40,6 +41,8 @@ class Lox:
 		# stop if there was a syntax error
 		if self.had_error: return
 		# print(AstPrinter().prints(expr))
+		resolver = Resolver(self, self.interpreter)
+		resolver.resolve(statements)
 		self.interpreter.interpret(statements)
 
 	def error(self, line: int, message: str) -> None:

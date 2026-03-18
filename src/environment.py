@@ -14,7 +14,19 @@ class Environment():
 
 	def define(self, name: str, value):
 		self.values[name] = value
-	
+
+	def get_at(self, distance: int, name: str):
+		return self.ancestor(distance).values[name]
+
+	def assign_at(self, distance: int, name: Token, value):
+		self.ancestor[name.lexeme] = value
+
+	def ancestor(self, distance: int):
+		environment = self
+		for i in range(distance):
+			environment = self.enclosing
+		return environment
+
 	def assign(self, name: Token, value):
 		if self.values.get(name.lexeme) is not None:
 			self.values[name.lexeme] = value

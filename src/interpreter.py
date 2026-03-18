@@ -10,6 +10,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 	def __init__(self, lox):
 		self.lox = lox
 		self.globals = Environment()
+		self.locals = {}
 		self.environment = self.globals
 		self.globals.define("clock", LoxBuiltins.Clock())
 
@@ -25,6 +26,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
 	def execute(self, statement: Stmt):
 		return statement.accept(self)
+
+	def resolve(self, expr: Expr, depth: int):
+		self.locals[expr]=depth
 
 	def execute_block(self, statements: list[Stmt], environment: Environment):
 		previous = self.environment
@@ -73,7 +77,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
 	def visit_assign_expr(self, expr: Assign):
 		value = self.evaluate(expr.value)
-		self.environment.assign(expr.name, value)
+		distance: int = self.locals.get[expr]
+		if distance is not None:
+			self.environment.assign_at(distance, expr.name, value)
+		else:
+			self.globals.assign(expr.name, value)
 		return value
 
 	def visit_binary_expr(self, expr: Binary):
@@ -153,7 +161,16 @@ class Interpreter(ExprVisitor, StmtVisitor):
 		return None
 	
 	def visit_variable_expr(self, expr: Variable):
-		return self.environment.get(expr.name)
+		# return self.environment.get(expr.name)
+		return self.lookup_variable(expr.name, expr)
+
+	def lookup_variable(self, name: Token, expr: Expr):
+		distance: int = self.locals.get(expr)
+		if distance is not None:
+			return self.environment.get_at(distance, name.lexeme)
+		else:
+			return self.globals.get(name)
+
 
 	def check_number_operand(self, operator: Token, operand):
 		# int would require not bool, since bool derives from int
