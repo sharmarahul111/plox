@@ -40,8 +40,8 @@ class Resolver(StmtVisitor, ExprVisitor):
 		self.resolves(expr.left)
 		self.resolves(expr.right)
 
-	def visit_call_expr(expr: Call):
-		self.resolve(expr.callee)
+	def visit_call_expr(self, expr: Call):
+		self.resolves(expr.callee)
 		for argument in expr.arguments:
 			self.resolves(argument)
 
