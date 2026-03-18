@@ -41,7 +41,11 @@ class Lox:
 		# stop if there was a syntax error
 		if self.had_error: return
 		# print(AstPrinter().prints(expr))
+		# TODO: add support for break, continue not outside loop check
+		# TODO: unused variable check, statement after return check
 		resolver = Resolver(self, self.interpreter)
+		# another check for resolution error
+		if self.had_error: return
 		resolver.resolve(statements)
 		self.interpreter.interpret(statements)
 

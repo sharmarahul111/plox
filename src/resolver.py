@@ -1,11 +1,17 @@
 from stmt import *
 from expr import *
 from environment import Nil
+from enum import Enum, auto
+
+class FunctionType(Enum):
+	NONE = auto()
+	FUNCTION = auto()
 
 class Resolver(StmtVisitor, ExprVisitor):
 	def __init__(self, lox: Lox, interpreter: Interpreter):
 		self.interpreter = interpreter
 		self.scopes: list[dict] = [] #stack
+		self.current_function = FunctionType.NONE
 	
 	def visit_block_stmt(self, stmt: Stmt):
 		self.begin_scope()
@@ -55,7 +61,7 @@ class Resolver(StmtVisitor, ExprVisitor):
 	def visit_function_stmt(self, stmt: Function):
 		self.declare(stmt.name)
 		self.define(stmt.name)
-		self.resolve_function(stmt)
+		self.resolve_function(stmt, self.current_function)
 
 	def visit_if_stmt(self, stmt: If):
 		self.resolves(stmt.condition)
@@ -71,6 +77,8 @@ class Resolver(StmtVisitor, ExprVisitor):
 		self.resolves(stmt.expression)
 
 	def visit_return_stmt(self, stmt: Return):
+		if self.current_function == FunctionType.NONE:
+			self.lox.error(stmt.keyword, "Can't return from top-level code.")
 		if stmt.value is not None:
 			self.resolves(stmt.value)
 
@@ -82,13 +90,16 @@ class Resolver(StmtVisitor, ExprVisitor):
 	def resolves(self, statement):
 		statement.accept(self)
 
-	def resolve_function(self, function: Function):
+	def resolve_function(self, function: Function, function_type: FunctionType):
+		enclosing_function: FunctionType = self.current_function
+		self.current_function = function_type
 		self.begin_scope()
 		for param in function.params:
 			self.declare(param)
 			self.define(param)
 		self.resolve(function.body)
 		self.end_scope()
+		self.current_function = enclosing_function
 
 	def begin_scope(self):
 		self.scopes.append({})
