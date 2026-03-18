@@ -6,6 +6,8 @@ class ExprVisitor:
 		...
 	def visit_get_expr(self, expr):
 		...
+	def visit_set_expr(self, expr):
+		...
 	def visit_grouping_expr(self, expr):
 		...
 	def visit_literal_expr(self, expr):
@@ -44,8 +46,20 @@ class Call(Expr):
 
 class Get(Expr):
 	def __init__(self, obj: Expr, name: Token):
-		self.obj = expr
+		self.obj = obj
 		self.name = name
+
+	def accept(self, visitor):
+		return visitor.visit_get_expr(self)
+
+class Set(Expr):
+	def __init__(self, obj: Expr, name: Token, value: Expr):
+		self.obj = obj
+		self.name = name
+		self.value = value
+
+	def accept(self, visitor):
+		return visitor.visit_set_expr(self)
 
 class Grouping(Expr):
 	def __init__(self, expr):

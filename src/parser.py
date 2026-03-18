@@ -164,6 +164,8 @@ class Parser:
 			if isinstance(expr, Variable):
 				name: Token = expr.name
 				return Assign(name, value)
+			elif isinstance(expr, Get):
+				return Set(expr.obj, expr.name, value)
 			self.error(equals, "Invalig assignment target.")
 		return expr
 

@@ -50,7 +50,11 @@ class Resolver(StmtVisitor, ExprVisitor):
 			self.resolves(argument)
 
 	def visit_get_expr(self, expr: Get):
-		self.resolve(expr.obj)
+		self.resolves(expr.obj)
+
+	def visit_set_expr(self, expr: Set):
+		self.resolves(expr.value)
+		self.resolves(expr.obj)
 
 	def visit_grouping_expr(self, expr: Grouping):
 		self.resolve(expr.expr)
