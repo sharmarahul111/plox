@@ -110,7 +110,7 @@ class Parser:
 		methods: list[Function] = []
 		while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
 			methods.append(self.function("method"))
-		self.consume(RIGHT_BRACE, "Expect '}' after class body.")
+		self.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
 		return Class(name, methods)
 
 	def var_declaration(self):
