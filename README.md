@@ -1,2 +1,2 @@
 # plox
-An implementation of the Lox PL from crafting interpreters in python
+Tree-walk interpreter for the Lox programming language with lexical analysis, parsing, and runtime evaluation in Python.
